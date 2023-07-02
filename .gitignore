@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+/.vs/
+/imgui/int/
+/imgui/x64/
+/AudioMonitor/int/
+/AudioMonitor/x64/
+/x64/
+
+*.pdb
+*.ini
+*.properties
+*.idb
