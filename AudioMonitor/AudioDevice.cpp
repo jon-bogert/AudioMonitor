@@ -5,6 +5,7 @@
 
 namespace
 {
+    AudioDevice* ad = nullptr;
     // Callback function for audio stream
     static int audioCallback(const void* inputBuffer, void* outputBuffer,
         unsigned long framesPerBuffer,
@@ -14,12 +15,14 @@ namespace
     {
         // Cast the input and output buffers to appropriate types
         float* in = (float*)inputBuffer;
-        float* out = (float*)outputBuffer;
-
-        // Copy input to output
-        for (unsigned int i = 0; i < framesPerBuffer; i++) {
-            *out++ = *in++;
-        }
+		float* out = (float*)outputBuffer;
+		for (unsigned int j = 0; j < ad->channelCount; j++)
+		{
+			for (unsigned int i = 0; i < framesPerBuffer; i++)
+            {
+				*out++ = *in++;
+			}
+		}
 
         return paContinue;
     }
@@ -43,6 +46,7 @@ void AudioDevice::Shutdown()
     if (err != paNoError) {
         std::cerr << "PortAudio termination failed: " << Pa_GetErrorText(err) << std::endl;
     }
+    //ad = nullptr;
 }
 
 void AudioDevice::LoadLast()
@@ -61,6 +65,8 @@ void AudioDevice::LoadLast()
         outputDeviceIndex = std::stoi(line);
         std::getline(file, line);
         outputLatency = std::stof(line);
+        std::getline(file, line);
+        channelCount = std::stoi(line);
     }
     catch (std::exception e) {}
 
@@ -77,6 +83,7 @@ void AudioDevice::SaveLast()
 		file << inputLatency << std::endl;
 		file << outputDeviceIndex << std::endl;
 		file << outputLatency << std::endl;
+        file << channelCount << std::endl;
 
 		file.close();
 	}
@@ -96,6 +103,7 @@ AudioDevice::~AudioDevice()
 
 void AudioDevice::Start()
 {
+    ad = this;
     // Initialize PortAudio
     err = Pa_Initialize();
     if (err != paNoError) {

@@ -26,7 +26,7 @@ public:
 	int channelCount = 1;
 	float inputLatency = 0.07f;
 	float outputLatency = 0.07f;
-	int bufferSize = 256;
+	int bufferSize = 2048;
 
 	PaStream* stream;
 	PaStreamParameters inputParameters;
