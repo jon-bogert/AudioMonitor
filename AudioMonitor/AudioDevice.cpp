@@ -66,6 +66,8 @@ void AudioDevice::LoadLast()
         std::getline(file, line);
         outputLatency = std::stof(line);
         std::getline(file, line);
+        bufferSize = std::stoi(line);
+        std::getline(file, line);
         channelCount = std::stoi(line);
     }
     catch (std::exception e) {}
@@ -83,6 +85,7 @@ void AudioDevice::SaveLast()
 		file << inputLatency << std::endl;
 		file << outputDeviceIndex << std::endl;
 		file << outputLatency << std::endl;
+        file << bufferSize << std::endl;
         file << channelCount << std::endl;
 
 		file.close();
