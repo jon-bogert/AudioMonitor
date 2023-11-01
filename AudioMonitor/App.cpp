@@ -13,11 +13,22 @@ void App::Start()
 
 void App::PreUpdate()
 {
+
 }
 
 void App::OnGUI()
 {
-	
+	if (audioDevice->GetIsClipping())
+		ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Clipping!");
+	else
+		ImGui::NewLine();
+
+	float volFactor = audioDevice->GetVolFactor();
+	if (ImGui::DragFloat("Volume Factor", &volFactor, 0.1f, 0.f, 25.f, "%.2f"))
+	{
+		audioDevice->SetVolFactor(volFactor);
+	}
+
 	if (ImGui::Combo("Input Device", &audioDevice->inputDeviceIndex, audioDevice->inputNames.c_str()))
 	{
 		audioDevice->Restart();

@@ -39,5 +39,9 @@ public:
 	void Restart();
 	void Shutdown();
 
+	void SetVolFactor(const float newGain);
+	float GetVolFactor() const;
+	bool GetIsClipping() const;
+
 };
 

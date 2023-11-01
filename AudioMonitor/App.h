@@ -5,7 +5,7 @@ class App
 public:
 	const wchar_t* name = L"Audio Monitor";
 	int windowWidth = 400;
-	int windowHight = 250;
+	int windowHight = 300;
 	bool useFloatingWindows = true;
 
 	AudioDevice* audioDevice = nullptr;

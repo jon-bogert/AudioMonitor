@@ -33,7 +33,11 @@ void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 bool GetDX11WindowPosition(HWND hwnd, float& x, float& y);
 
+#ifdef _CONSOLE
+int main()
+#else
 int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow)
+#endif //_CONSOLE
 {
     App app;
     // Create application window

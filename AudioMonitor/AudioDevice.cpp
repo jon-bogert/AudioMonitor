@@ -6,6 +6,9 @@
 namespace
 {
     AudioDevice* ad = nullptr;
+    float volFactor = 1.f;
+    bool isClipping = false;
+
     // Callback function for audio stream
     static int audioCallback(const void* inputBuffer, void* outputBuffer,
         unsigned long framesPerBuffer,
@@ -20,7 +23,23 @@ namespace
 		{
 			for (unsigned int i = 0; i < framesPerBuffer; i++)
             {
-				*out++ = *in++;
+                float result = *in++ * volFactor;
+                //std::cout << result << std::endl;
+                if (result > 1.f)
+                {
+                    result = 1.f;
+                    isClipping = true;
+                }
+                else if (result < -1.f)
+                {
+                    result = -1.f;
+                    isClipping = true;
+                }
+                else
+                {
+                    isClipping = false;
+                }
+				*out++ = result;
 			}
 		}
 
@@ -47,6 +66,21 @@ void AudioDevice::Shutdown()
         std::cerr << "PortAudio termination failed: " << Pa_GetErrorText(err) << std::endl;
     }
     //ad = nullptr;
+}
+
+void AudioDevice::SetVolFactor(const float newGain)
+{
+    ::volFactor = newGain;
+}
+
+float AudioDevice::GetVolFactor() const
+{
+    return ::volFactor;
+}
+
+bool AudioDevice::GetIsClipping() const
+{
+    return isClipping;
 }
 
 void AudioDevice::LoadLast()
