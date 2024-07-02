@@ -24,7 +24,7 @@ namespace
 			for (unsigned int i = 0; i < framesPerBuffer; i++)
             {
                 float result = *in++ * volFactor;
-                //std::cout << result << std::endl;
+
                 if (result > 1.f)
                 {
                     result = 1.f;
@@ -51,21 +51,23 @@ void AudioDevice::Shutdown()
 {
     // Stop and close the audio stream
     err = Pa_StopStream(stream);
-    if (err != paNoError) {
+    if (err != paNoError)
+    {
         std::cerr << "Failed to stop audio stream: " << Pa_GetErrorText(err) << std::endl;
     }
 
     err = Pa_CloseStream(stream);
-    if (err != paNoError) {
+    if (err != paNoError)
+    {
         std::cerr << "Failed to close audio stream: " << Pa_GetErrorText(err) << std::endl;
     }
 
     // Terminate PortAudio
     err = Pa_Terminate();
-    if (err != paNoError) {
+    if (err != paNoError)
+    {
         std::cerr << "PortAudio termination failed: " << Pa_GetErrorText(err) << std::endl;
     }
-    //ad = nullptr;
 }
 
 void AudioDevice::SetVolFactor(const float newGain)
@@ -86,7 +88,8 @@ bool AudioDevice::GetIsClipping() const
 void AudioDevice::LoadLast()
 {
     std::ifstream file("settings.properties");
-    if (!file.is_open()) return;
+    if (!file.is_open())
+        return;
 
     try
     {
@@ -143,25 +146,23 @@ void AudioDevice::Start()
     ad = this;
     // Initialize PortAudio
     err = Pa_Initialize();
-    if (err != paNoError) {
+    if (err != paNoError)
+    {
         std::cerr << "PortAudio initialization failed: " << Pa_GetErrorText(err) << std::endl;
         return;
     }
     // Get the number of available host APIs
     int numHostApis = Pa_GetHostApiCount();
-    if (numHostApis < 0) {
+    if (numHostApis < 0)
+    {
         std::cerr << "Failed to get the number of host APIs" << std::endl;
         Pa_Terminate();
         return;
     }
 
     // Print the available host APIs
-    //std::cout << "Available audio APIs:" << std::endl;
-    //for (int i = 0; i < numHostApis; i++) {
-    //    const PaHostApiInfo* hostApiInfo = Pa_GetHostApiInfo(i);
-    //    std::cout << i << ": " << hostApiInfo->name << std::endl;
-    //}
-    for (int i = 0; i < numHostApis; i++) {
+    for (int i = 0; i < numHostApis; i++)
+    {
         const PaHostApiInfo* hostApiInfo = Pa_GetHostApiInfo(i);
         driverNames.push_back(hostApiInfo->name);
     }
@@ -175,19 +176,23 @@ void AudioDevice::Start()
     }
 
     // Separate input and output devices
-    for (int i = 0; i < numDevices; i++) {
+    for (int i = 0; i < numDevices; i++)
+    {
         const PaDeviceInfo* deviceInfo = Pa_GetDeviceInfo(i);
-        if (deviceInfo->maxInputChannels > 0) {
+        if (deviceInfo->maxInputChannels > 0)
+       {
             inputDeviceIndices.push_back(i);
         }
-        if (deviceInfo->maxOutputChannels > 0) {
+        if (deviceInfo->maxOutputChannels > 0)
+        {
             outputDeviceIndices.push_back(i);
         }
     }
     //Load Input Names
     inputNames.append("System Default");
     inputNames.push_back('\0');
-    for (int i = 1; i < inputDeviceIndices.size(); i++) {
+    for (int i = 1; i < inputDeviceIndices.size(); i++)
+    {
         const PaDeviceInfo* deviceInfo = Pa_GetDeviceInfo(inputDeviceIndices[i]);
         inputNames.append(deviceInfo->name);
         inputNames.push_back('\0');
@@ -196,34 +201,36 @@ void AudioDevice::Start()
     outputNames.append("System Default");
     outputNames.push_back('\0');
     //Load Output Names
-    for (int i = 1; i < outputDeviceIndices.size(); i++) {
+    for (int i = 1; i < outputDeviceIndices.size(); i++)
+    {
         const PaDeviceInfo* deviceInfo = Pa_GetDeviceInfo(outputDeviceIndices[i]);
         outputNames.append(deviceInfo->name);
         outputNames.push_back('\0');
     }
     outputNames.pop_back();
 
-    if (inputDeviceIndex >= inputNames.size()) inputDeviceIndex = 0;
-    if (outputDeviceIndex >= outputNames.size()) outputDeviceIndex = 0;
+    if (inputDeviceIndex >= inputNames.size())
+        inputDeviceIndex = 0;
+    if (outputDeviceIndex >= outputNames.size())
+        outputDeviceIndex = 0;
 
     // Open the audio stream with the selected devices and host API
     inputParameters.device = inputDeviceIndices[inputDeviceIndex];
     inputParameters.channelCount = channelCount;
     inputParameters.sampleFormat = paFloat32;
-    //inputParameters.suggestedLatency = Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency;
     inputParameters.suggestedLatency = inputLatency;
     inputParameters.hostApiSpecificStreamInfo = nullptr;
 
     outputParameters.device = outputDeviceIndices[outputDeviceIndex];
     outputParameters.channelCount = channelCount;
     outputParameters.sampleFormat = paFloat32;
-    //outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency;
     outputParameters.suggestedLatency = outputLatency;
     outputParameters.hostApiSpecificStreamInfo = nullptr;
 
     err = Pa_OpenStream(&stream, &inputParameters, &outputParameters, 44100, bufferSize,
         paNoFlag, audioCallback, nullptr);
-    if (err != paNoError) {
+    if (err != paNoError)
+    {
         std::cerr << "Failed to open audio stream: " << Pa_GetErrorText(err) << std::endl;
         Pa_Terminate();
         return;
@@ -231,7 +238,8 @@ void AudioDevice::Start()
 
     // Start the audio stream
     err = Pa_StartStream(stream);
-    if (err != paNoError) {
+    if (err != paNoError)
+    {
         std::cerr << "Failed to start audio stream: " << Pa_GetErrorText(err) << std::endl;
         Pa_CloseStream(stream);
         Pa_Terminate();
